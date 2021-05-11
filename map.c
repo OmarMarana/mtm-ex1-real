@@ -6,11 +6,11 @@
 #define ITERATOR_UNDEFINED NULL
 #define MAP_ERROR -1
 
- MapDataElement f1(MapDataElement a);
- MapKeyElement f2(MapKeyElement a);
- void f3(MapDataElement a);
- void f4(MapKeyElement a);
- int f5(MapKeyElement a, MapKeyElement b);
+//  MapDataElement f1(MapDataElement a);
+//  MapKeyElement f2(MapKeyElement a);
+//  void f3(MapDataElement a);
+//  void f4(MapKeyElement a);
+//  int f5(MapKeyElement a, MapKeyElement b);
 
 struct Map_t
 {
@@ -74,48 +74,42 @@ MapKeyElement mapGetNext(Map map)
 
 
 
-// Map mapCreate(copyMapDataElements copyDataElement, copyMapKeyElements copyKeyElement,
-//               freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement,
-//               compareMapKeyElements compareKeyElements)
-// {
-//     if(copyDataElement == NULL || copyKeyElement == NULL || freeDataElement == NULL || freeKeyElement == NULL
-//     || compareKeyElements == NULL)
-//     {
-//         return NULL;
-//     }
+Map mapCreate(copyMapDataElements copyDataElement, copyMapKeyElements copyKeyElement,
+              freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement,
+              compareMapKeyElements compareKeyElements)
+{
+    if(copyDataElement == NULL || copyKeyElement == NULL || freeDataElement == NULL || freeKeyElement == NULL
+    || compareKeyElements == NULL)
+    {
+        return NULL;
+    }
     
-//     Map map_to_create = malloc(sizeof(*map_to_create));
-//     if(map_to_create == NULL)
-//     {
-//         return NULL;
-//     }
+    Map map_to_create = malloc(sizeof(*map_to_create));
+    if(map_to_create == NULL)
+    {
+        return NULL;
+    }
    
-//     map_to_create->key_elements = malloc(sizeof(*(map_to_create->key_elements))*INITIAL_SIZE);
-//     if(map_to_create->key_elements == NULL)
-//     {
-//         return NULL;
-//     }
+    map_to_create->elements_pair = malloc(sizeof(map_to_create->elements_pair));
+    if(map_to_create->elements_pair == NULL)
+    {
+        return NULL;
+    }
    
-//     map_to_create->data_elements = malloc(sizeof(*(map_to_create->data_elements))*INITIAL_SIZE);
-//     if(map_to_create->data_elements == NULL)
-//     {
-//         return NULL;
-//     }
-//     map_to_create->active_size =0;
-//     map_to_create->allocated_size =INITIAL_SIZE;
+    /*NOTE: iterator may need malloc*/
 
-//     map_to_create->copyDataFucntion = copyDataElement;
-//     map_to_create->copyKeyFucntion = copyKeyElement;
+    map_to_create->copyDataFucntion = copyDataElement;
+    map_to_create->copyKeyFucntion = copyKeyElement;
 
-//     map_to_create->freeDataFucntion = freeDataElement;
-//     map_to_create->freeKeyFucntion = freeKeyElement;
+    map_to_create->freeDataFucntion = freeDataElement;
+    map_to_create->freeKeyFucntion = freeKeyElement;
 
-//     map_to_create->compareFunction = compareKeyElements;
+    map_to_create->compareFunction = compareKeyElements;
     
     
-//     return map_to_create;
+    return map_to_create;
 
-// }
+}
 
 
 // int main()

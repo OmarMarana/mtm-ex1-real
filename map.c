@@ -118,7 +118,16 @@ void mapDestroy(Map map)
     {
         return;
     }
+
+    /*NOTE: free the linked list and then free the map pointer */
+
+    /*encountered a problem while implementing. Mapdestroy uses the functions
+    nodeDestory and nodeFree, these functions need access to freeDataFucntion and 
+    freeKeyFucntion, but these are not reachable outside of map.c.
+    We may have to move the contents of node.h and node.c to map.c to solve this
+    issue. */
 }
+
 
 
 // int main()

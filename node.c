@@ -42,6 +42,7 @@ void nodeDestroy(Node list)
 
 void nodeFree(Node node)
 {
+    
     free(node);
 }
 

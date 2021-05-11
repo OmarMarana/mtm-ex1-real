@@ -112,6 +112,15 @@ Map mapCreate(copyMapDataElements copyDataElement, copyMapKeyElements copyKeyEle
 }
 
 
+void mapDestroy(Map map)
+{
+    if(map == NULL)
+    {
+        return;
+    }
+}
+
+
 // int main()
 // {
 

@@ -13,7 +13,7 @@ typedef enum NodeResult_t {
 Node nodeCreate();
 NodeResult nodeAddOrEdit(Node node_head, Node new_node, compareMapKeyElements compare_key_func);
 
-void nodeDestroy();
+void nodeDestroy(Node list);
 
 /* get */
 Node nodeGetNext(Node node);

@@ -29,6 +29,25 @@ Node nodeCreate()
     return new_node;
 }
 
+
+void nodeDestroy(Node list)
+{
+    while(list != NULL)
+    {
+        Node node_to_delete = list;
+        list = list->next;
+        nodefree(node_to_delete);
+    }
+}
+
+void nodeFree(Node node)
+{
+    free(node);
+}
+
+
+
+
 /*  add element to the map's Node.
     if the element key is already in the list, only change the data.
     the new element will be in-place in LOW to HIGH order by comapre-key.

@@ -14,6 +14,7 @@ Node nodeCreate();
 NodeResult nodeAddOrEdit(Node node_head, Node new_node, compareMapKeyElements compare_key_func);
 
 void nodeDestroy(Node list);
+void nodeFree(Node node);
 
 /* get */
 Node nodeGetNext(Node node);

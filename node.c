@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 
+//The struct definition:
 struct node_t
 {
     MapDataElement data;

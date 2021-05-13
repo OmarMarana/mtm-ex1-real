@@ -271,6 +271,22 @@ MapResult mapRemove(Map map, MapKeyElement keyElement)
 
 
 
+MapResult mapClear(Map map)
+{
+    if(map == NULL)
+    {
+        return MAP_NULL_ARGUMENT;
+    }
+
+    nodeDestroy(map->elements_pair, map->freeDataFucntion, map->freeKeyFucntion);
+
+    return MAP_SUCCESS;
+
+}
+
+
+
+
 
 // int main()
 // {

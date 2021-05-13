@@ -213,6 +213,63 @@ bool mapContains(Map map, MapKeyElement element)
 }
 
 
+MapDataElement mapGet(Map map, MapKeyElement keyElement)
+{
+    if(map == NULL || keyElement == NULL)
+    {
+        return NULL;
+    }
+
+
+    Node iterator_next = nodeGetNext(map->elements_pair);
+
+    while(iterator_next  != NULL)
+    {
+        /*maybe should define the return values of compareFunction*/
+        if(map->compareFunction(nodeGetKey(iterator_next), keyElement) == 0)
+        {
+            return nodeGetData(iterator_next);
+        }
+        iterator_next = nodeGetNext(iterator_next);
+    }
+
+
+    /*Should we #define NULL = KEY_NOT_FOUND?*/
+    return NULL;
+
+}
+
+
+MapResult mapRemove(Map map, MapKeyElement keyElement)
+{
+    if(map == NULL || keyElement == NULL)
+    {
+        return MAP_NULL_ARGUMENT;
+    }
+
+    Node iterator_next = nodeGetNext(map->elements_pair);
+    Node iterator_previous =map->elements_pair;
+
+
+    while(iterator_next  != NULL)
+    {
+        /*maybe should define the return values of compareFunction*/
+        if(map->compareFunction(nodeGetKey(iterator_next), keyElement) == 0)
+        {
+            nodeSetNext(iterator_previous,nodeGetNext(iterator_next));
+            nodeFree(iterator_next , map->freeDataFucntion , map->freeKeyFucntion);
+            return MAP_SUCCESS;
+        }
+        iterator_previous = nodeGetNext(iterator_previous);
+        iterator_next = nodeGetNext(iterator_next);
+    }
+
+    map->iterator = ITERATOR_UNDEFINED;
+    return MAP_ITEM_DOES_NOT_EXIST;
+}
+
+
+
 
 
 // int main()

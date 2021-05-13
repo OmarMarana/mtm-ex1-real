@@ -31,7 +31,7 @@ Node nodeCreate()
 }
 
 
-void nodeDestroy(Node list)
+void nodeDestroy(Node list, freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement)
 {
     while(list != NULL)
     {
@@ -41,9 +41,11 @@ void nodeDestroy(Node list)
     }
 }
 
-void nodeFree(Node node)
+
+void nodeFree(Node node ,freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement)
 {
-    
+    freeDataElement(node->data);
+    freeKeyElement(node->key);
     free(node);
 }
 

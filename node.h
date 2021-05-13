@@ -9,12 +9,16 @@ typedef enum NodeResult_t {
     NODE_OUT_OF_MEMORY,
     NODE_NULL_ARGUMENT
 } NodeResult;
-
+/* compare_key_func may have to be renamed due to conventions */
 Node nodeCreate();
 NodeResult nodeAddOrEdit(Node node_head, Node new_node, compareMapKeyElements compare_key_func);
 
-void nodeDestroy(Node list);
-void nodeFree(Node node);
+
+/*Destroys a linked list*/
+void nodeDestroy(Node list, freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement);
+
+/*Frees a single node in a list using the free function supplied by the user*/
+void nodeFree(Node node ,freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement);
 
 /* get */
 Node nodeGetNext(Node node);

@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #define ITERATOR_UNDEFINED NULL
-#define MAP_ERROR -1
 
 //  MapDataElement f1(MapDataElement a);
 //  MapKeyElement f2(MapKeyElement a);
@@ -31,8 +30,16 @@ MapResult mapPut(Map map, MapKeyElement keyElement, MapDataElement dataElement)
     {
         return MAP_NULL_ARGUMENT;
     }
-
-    map->iterator = ITERATOR_UNDEFINED;
+    if(mapContains(map ,keyElement))
+    {
+        NodeResult result = nodeEditData(map, nodeGetByKey(map->elements_pair, keyElement, map->compareFunction)
+                                         , dataElement);
+        if(result == NODE_SUCCESS)
+        {
+            return MAP_SUCCESS;
+        }
+        return MAP_OUT_OF_MEMORY;
+    }
 
     Node new_node = nodeCreate();
     if(new_node == NULL)
@@ -40,43 +47,83 @@ MapResult mapPut(Map map, MapKeyElement keyElement, MapDataElement dataElement)
         return MAP_OUT_OF_MEMORY;
     }
 
-    nodeSetData(new_node, dataElement);
-    nodeSetKey(new_node, keyElement);
-    if(nodeAddOrEdit(map->elements_pair, new_node, map->compareFunction) == NODE_SUCCESS)
+    MapDataElement copy_data = map->copyDataFucntion(dataElement);
+    if(copy_data == NULL)
     {
+        nodeFree(new_node, map->freeDataFucntion, map->freeKeyFucntion);
+        return MAP_OUT_OF_MEMORY;
+    }
+
+    MapKeyElement copy_key = map->copyKeyFucntion(keyElement);
+    if(copy_key == NULL)
+    {
+        nodeFree(new_node, map->freeDataFucntion, map->freeKeyFucntion);
+        map->freeDataFucntion(copy_data);
+        return MAP_OUT_OF_MEMORY;
+    }
+
+    nodeSetData(new_node, copy_data);
+    nodeSetKey(new_node, copy_key);
+
+    NodeResult add_result = nodeAdd(map->elements_pair, new_node, map->compareFunction);
+
+    if(add_result == NODE_SUCCESS)
+    {
+        map->iterator = ITERATOR_UNDEFINED;
         return MAP_SUCCESS;
     }
+
+    freeMapDataElements(copy_data);
+    freeMapKeyElements(copy_key);
+    nodeFree(new_node, map->freeDataFucntion, map->freeKeyFucntion);
     
     return MAP_ERROR;
 }
 
-MapKeyElement mapGetFirst(Map map)
+static NodeResult nodeEditData(Map map, Node node_to_edit, MapDataElement data)
 {
-    map->iterator = (map->elements_pair);
-    return mapGetNext(map);
+    MapDataElement copy_data = map->copyDataFucntion(data);
+    if(copy_data == NULL)
+    {
+        return NODE_OUT_OF_MEMORY;
+    }
+
+    map->freeDataFucntion(nodeGetData(node_to_edit));
+    nodeSetData(node_to_edit, copy_data);
+
+    return NODE_SUCCESS;
 }
 
-/*listGetNext?? maybe nodeGetNext??*/
-MapKeyElement mapGetNext(Map map)
+MapKeyElement mapGetFirst(Map map)
 {
-    if(listGetNext(map->iterator) == NULL || map == NULL)
+    if(map == NULL)
     {
         return NULL;
     }
 
-    //TODO : check if iterator is in invalid state.
-    // if is in-valid state, return NULL.
+    map->iterator = (map->elements_pair);
 
-    map->iterator = nodeGetNext(map->iterator);
-
-    /*This may be a bug since now we have two variables pointing to the same
-    place*/
-    MapKeyElement key_element_copy = nodeGetKey(map->iterator);
-
-    return key_element_copy;
+    return mapGetNext(map);
 }
 
+MapKeyElement mapGetNext(Map map)
+{
+    if(map == NULL || nodeGetNext(map->iterator) == NULL ||
+       map->iterator == ITERATOR_UNDEFINED)
+    {
+        return NULL;
+    }
 
+    map->iterator = nodeGetNext(map->iterator);
+    
+    MapKeyElement copy = map->copyKeyFucntion(nodeGetKey(map->iterator));
+    if(copy == NULL)
+    {
+        return NULL;
+    }
+
+    return copy;
+}
 
 Map mapCreate(copyMapDataElements copyDataElement, copyMapKeyElements copyKeyElement,
               freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement,
@@ -139,7 +186,7 @@ Map mapCopy(Map map)
     }
 
     Map map_copy = mapCreate(map->copyDataFucntion , map->copyKeyFucntion, map->freeDataFucntion,
-    map->freeKeyFucntion,map->compareFunction);
+                             map->freeKeyFucntion, map->compareFunction);
 
     if(map_copy == NULL)
     {
@@ -149,7 +196,7 @@ Map mapCopy(Map map)
     Node iterator_next = nodeGetNext(map->elements_pair);
     while(iterator_next  != NULL)
     {
-        MapResult map_put_result =mapPut(map_copy, nodeGetKey(iterator_next),nodeGetData(iterator_next)); 
+        MapResult map_put_result = mapPut(map_copy, nodeGetKey(iterator_next), nodeGetData(iterator_next));
         if(map_put_result != MAP_SUCCESS) 
         {
             mapDestroy(map_copy); 
@@ -165,9 +212,6 @@ Map mapCopy(Map map)
     return map_copy;
 }
 
-
-
-/*should we count the head of the list? it contains no info...   */
 int mapGetSize(Map map)
 {
     if(map == NULL)
@@ -185,7 +229,6 @@ int mapGetSize(Map map)
     }
 
     return number_of_elements;
-
 }
 
 
@@ -200,7 +243,6 @@ bool mapContains(Map map, MapKeyElement element)
 
     while(iterator_next  != NULL)
     {
-        /*maybe should define the return values of compareFunction*/
         if(map->compareFunction(nodeGetKey(iterator_next), element) == 0)
         {
             return true;
@@ -220,12 +262,10 @@ MapDataElement mapGet(Map map, MapKeyElement keyElement)
         return NULL;
     }
 
-
     Node iterator_next = nodeGetNext(map->elements_pair);
 
     while(iterator_next  != NULL)
     {
-        /*maybe should define the return values of compareFunction*/
         if(map->compareFunction(nodeGetKey(iterator_next), keyElement) == 0)
         {
             return nodeGetData(iterator_next);
@@ -233,8 +273,6 @@ MapDataElement mapGet(Map map, MapKeyElement keyElement)
         iterator_next = nodeGetNext(iterator_next);
     }
 
-
-    /*Should we #define NULL = KEY_NOT_FOUND?*/
     return NULL;
 
 }
@@ -248,16 +286,15 @@ MapResult mapRemove(Map map, MapKeyElement keyElement)
     }
 
     Node iterator_next = nodeGetNext(map->elements_pair);
-    Node iterator_previous =map->elements_pair;
+    Node iterator_previous = map->elements_pair;
 
 
-    while(iterator_next  != NULL)
+    while(iterator_next != NULL)
     {
-        /*maybe should define the return values of compareFunction*/
         if(map->compareFunction(nodeGetKey(iterator_next), keyElement) == 0)
         {
-            nodeSetNext(iterator_previous,nodeGetNext(iterator_next));
-            nodeFree(iterator_next , map->freeDataFucntion , map->freeKeyFucntion);
+            nodeSetNext(iterator_previous, nodeGetNext(iterator_next));
+            nodeFree(iterator_next, map->freeDataFucntion, map->freeKeyFucntion);
             return MAP_SUCCESS;
         }
         iterator_previous = nodeGetNext(iterator_previous);

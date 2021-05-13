@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//hello
 //The struct definition:
 struct node_t
 {
@@ -51,12 +50,28 @@ void nodeFree(Node node ,freeMapDataElements freeDataElement,freeMapKeyElements 
 
 
 
+Node nodeGetByKey(Node list, MapKeyElement key, compareMapKeyElements compare_func)
+{
+    Node temp = nodeGetNext(list);
+    while(temp != NULL)
+    {
+        if(compare_func(nodeGetKey(temp), key) == 0)
+        {
+            return temp;
+        }
+        temp = nodeGetNext(temp);
+    }
+    return NULL;
+}
+
 
 /*  add element to the map's Node.
-    if the element key is already in the list, only change the data.
     the new element will be in-place in LOW to HIGH order by comapre-key.
+    You must check (before using this function) if new_node is not in the list already.
+    this function assumes that 'new_node' is not in the list.
 */
-NodeResult nodeAddOrEdit(Node node_head, Node new_node, compareMapKeyElements compare_key_func)
+NodeResult nodeAdd(Node node_head, Node new_node, compareMapKeyElements compare_key_func, 
+                   freeMapDataElements free_data_func)
 {
     if(node_head == NULL || new_node == NULL || compare_key_func == NULL)
     {
@@ -78,11 +93,6 @@ NodeResult nodeAddOrEdit(Node node_head, Node new_node, compareMapKeyElements co
         {
             nodeSetNext(temp_previous, new_node);
             nodeSetNext(new_node, temp);
-            return NODE_SUCCESS;
-        }
-        else if (compare_result == 0)
-        {
-            nodeSetData(temp, nodeGetData(new_node));
             return NODE_SUCCESS;
         }
     }
@@ -153,7 +163,7 @@ void nodeSetKey(Node node, MapKeyElement key)
 /* set the element's next node. */
 void nodeSetNext(Node node_from, Node node_to)
 {
-    if(node_from == NULL || node_to == NULL)
+    if(node_from == NULL)
     {
         return;
     }

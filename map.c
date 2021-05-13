@@ -69,7 +69,11 @@ MapKeyElement mapGetNext(Map map)
 
     map->iterator = nodeGetNext(map->iterator);
 
-    return (nodeGetKey(map->iterator));
+    /*This may be a bug since now we have two variables pointing to the same
+    place*/
+    MapKeyElement key_element_copy = nodeGetKey(map->iterator);
+
+    return key_element_copy;
 }
 
 

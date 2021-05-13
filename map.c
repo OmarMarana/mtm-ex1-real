@@ -134,21 +134,15 @@ Map mapCopy(Map map)
         return NULL;
     }
 
-    Map map_copy = malloc(sizeof(*map_copy));
-    if( map_copy  == NULL)
+    Map map_copy = mapCreate(map->copyDataFucntion , map->copyKeyFucntion, map->freeDataFucntion,
+    map->freeKeyFucntion,map->compareFunction);
+
+    if(map_copy == NULL)
     {
         return NULL;
     }
 
-    map_copy->elements_pair = nodeCreate();
-    if(map_copy->elements_pair == NULL)
-    {
-        mapDestroy(map_copy);
-        return NULL;
-    }
-
-    map->iterator = map->elements_pair;
-    Node iterator_next = nodeGetNext(map->iterator);
+    Node iterator_next = nodeGetNext(map->elements_pair);
     while(iterator_next  != NULL)
     {
         MapResult map_put_result =mapPut(map_copy, nodeGetKey(iterator_next),nodeGetData(iterator_next)); 
@@ -163,12 +157,6 @@ Map mapCopy(Map map)
 
     map->iterator = ITERATOR_UNDEFINED;
     map_copy->iterator = ITERATOR_UNDEFINED;
-    
-    map_copy->copyDataFucntion = map->copyDataFucntion ;
-    map_copy->copyKeyFucntion = map->copyKeyFucntion ;
-    map_copy->freeDataFucntion = map->freeDataFucntion ;
-    map_copy->freeKeyFucntion = map->freeKeyFucntion ;
-    map_copy->compareFunction  = map->compareFunction ;
 
     return map_copy;
 }

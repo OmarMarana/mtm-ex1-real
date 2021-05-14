@@ -1,6 +1,10 @@
 #ifndef NODE_H_
 #define NODE_H_
 
+#ifndef MAP_H_
+#include "map.h"
+#endif
+
 typedef struct node_t *Node;
 
 /** Type used for returning error codes from node functions */
@@ -21,7 +25,7 @@ Node nodeGetByKey(Node list, MapKeyElement key, compareMapKeyElements compare_fu
 void nodeDestroy(Node list, freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement);
 
 /*Frees a single node in a list using the free function supplied by the user*/
-void nodeFree(Node node ,freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement);
+void nodeFree(Node node, freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement);
 
 /* get */
 Node nodeGetNext(Node node);

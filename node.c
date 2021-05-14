@@ -30,13 +30,13 @@ Node nodeCreate()
 }
 
 
-void nodeDestroy(Node list, freeMapDataElements freeDataElement,freeMapKeyElements freeKeyElement)
+void nodeDestroy(Node list, freeMapDataElements freeDataElement, freeMapKeyElements freeKeyElement)
 {
     while(list != NULL)
     {
         Node node_to_delete = list;
         list = list->next;
-        nodefree(node_to_delete);
+        nodeFree(node_to_delete, freeDataElement, freeKeyElement);
     }
 }
 
@@ -69,9 +69,11 @@ Node nodeGetByKey(Node list, MapKeyElement key, compareMapKeyElements compare_fu
     the new element will be in-place in LOW to HIGH order by comapre-key.
     You must check (before using this function) if new_node is not in the list already.
     this function assumes that 'new_node' is not in the list.
+
+    NodeResult nodeAdd(Node node_head, Node new_node, compareMapKeyElements compare_key_func);
+
 */
-NodeResult nodeAdd(Node node_head, Node new_node, compareMapKeyElements compare_key_func, 
-                   freeMapDataElements free_data_func)
+NodeResult nodeAdd(Node node_head, Node new_node, compareMapKeyElements compare_key_func)
 {
     if(node_head == NULL || new_node == NULL || compare_key_func == NULL)
     {

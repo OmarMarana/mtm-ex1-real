@@ -3,13 +3,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ITERATOR_UNDEFINED NULL
 
-//  MapDataElement f1(MapDataElement a);
-//  MapKeyElement f2(MapKeyElement a);
-//  void f3(MapDataElement a);
-//  void f4(MapKeyElement a);
-//  int f5(MapKeyElement a, MapKeyElement b);
+#define ITERATOR_UNDEFINED NULL
+static NodeResult nodeEditData(Map map, Node node_to_edit, MapDataElement data);
+
+ MapDataElement copyDataFunc(MapDataElement a);
+ MapKeyElement copyKeyFunc(MapKeyElement a);
+ void freeDataFunc(MapDataElement a);
+ void freeKeyFunc(MapKeyElement a);
+ int compareKey(MapKeyElement a, MapKeyElement b);
 
 struct Map_t
 {
@@ -73,8 +75,8 @@ MapResult mapPut(Map map, MapKeyElement keyElement, MapDataElement dataElement)
         return MAP_SUCCESS;
     }
 
-    freeMapDataElements(copy_data);
-    freeMapKeyElements(copy_key);
+    map->freeDataFucntion(copy_data);
+    map->freeKeyFucntion(copy_key);
     nodeFree(new_node, map->freeDataFucntion, map->freeKeyFucntion);
     
     return MAP_ERROR;
@@ -323,43 +325,62 @@ MapResult mapClear(Map map)
 
 
 
+ int main()
+ {
+    Map my_map = mapCreate(copyDataFunc, copyKeyFunc, freeDataFunc, freeKeyFunc, compareKey);
 
+    if(my_map != NULL)
+        printf("my_map created succefully ! GJ\n");
 
-// int main()
-// {
+    int map_size = mapGetSize(my_map);
+    printf("my_map size is: %d\n", map_size);
 
-//     Map map = mapCreate(f1,f2,f3,f4,f5);
-//     printf("%d", map->allocated_size);
+    int k[5] = {0,1,2,3,4};
+    int d[5] = {0,1,2,3,4};
+
+    for(int i = 0; i < 5; i++)
+    {
+        if(mapPut(my_map, &(k[i]), &(d[i])) == MAP_SUCCESS)
+            printf("element #%d successfully insterted into map.\n", i+1);
+    }
     
-//     return 0;
-// }
+    map_size = mapGetSize(my_map);
+    printf("my_map size is: %d\n", map_size);
 
-//  MapDataElement f1(MapDataElement a)
-// {
-//     return NULL;
+    return 0;
+ }
 
-// }
-//  MapKeyElement f2(MapKeyElement a)
-// {
-//     return NULL;
+ MapDataElement copyDataFunc(MapDataElement a)
+ {
+     int* c = malloc(sizeof(int));
+     *c = *( (int*)a );
+     
+    return c;
+ }
 
-// }
+ MapKeyElement copyKeyFunc(MapKeyElement a)
+ {
+     int* c = malloc(sizeof(int));
+     *c = *( (int*)a );
 
+    return c;
+ }
 
-//  void f3(MapDataElement a)
-// {
-    
-// }
+ void freeDataFunc(MapDataElement a)
+ {
+     free((int*)a);
+ }
 
-//  void f4(MapKeyElement a)
-// {
-    
-// }
+ void freeKeyFunc(MapKeyElement a)
+ {
+     free((int*)a);
+ }
 
-//  int f5(MapKeyElement a, MapKeyElement b)
-// {
-//     return 0;
-// }
-
-
-
+ int compareKey(MapKeyElement a, MapKeyElement b)
+ {
+    if( *((int*)a)  >  *((int*)b) )
+        return 1;
+    if( *((int*)a)  <  *((int*)b) )
+        return -1;
+    return 0;
+ }
